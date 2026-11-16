@@ -1,0 +1,25 @@
+name: Windows installer
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run dist
+      - name: Create GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $installers = Get-ChildItem -LiteralPath release -Filter '*-Setup.exe' | Select-Object -ExpandProperty FullName
+          gh release create $env:GITHUB_REF_NAME $installers --verify-tag --prerelease --notes-file docs/RELEASE.md --title "Zetty Studio $env:GITHUB_REF_NAME"

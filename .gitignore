@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist-electron/
+release/
+test-results/
+playwright-report/
+.env
+.env.*
+!.env.example
+*.log
+*.webm
+*.mp4
+.local/
