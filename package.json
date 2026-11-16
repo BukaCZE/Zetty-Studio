@@ -12,8 +12,8 @@
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
     "build": "npm run typecheck && vite build && npm run build:desktop",
     "start": "electron .",
-    "dist": "npm run build && electron-builder --win nsis --x64",
-    "pack": "npm run build && electron-builder --dir --win --x64",
+    "dist": "npm run build && electron-builder --win nsis --x64 --publish never",
+    "pack": "npm run build && electron-builder --dir --win --x64 --publish never",
     "test": "tsx --test tests/*.test.ts",
     "test:ui": "playwright test",
     "relay": "tsx relay/server.ts"

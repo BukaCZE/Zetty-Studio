@@ -2,24 +2,34 @@ name: Windows installer
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to build and publish
+        required: true
+        type: string
 permissions:
   contents: write
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run dist
+      - run: npm run dist -- --publish never
       - name: Create GitHub release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $installers = Get-ChildItem -LiteralPath release -Filter '*-Setup.exe' | Select-Object -ExpandProperty FullName
-          gh release create $env:GITHUB_REF_NAME $installers --verify-tag --prerelease --notes-file docs/RELEASE.md --title "Zetty Studio $env:GITHUB_REF_NAME"
+          gh release create $env:RELEASE_TAG $installers --verify-tag --prerelease --notes-file docs/RELEASE.md --title "Zetty Studio $env:RELEASE_TAG"
