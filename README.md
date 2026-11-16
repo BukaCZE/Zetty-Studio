@@ -1,0 +1,2 @@
+# Zetty-Studio
+Streamovací Aplikace
