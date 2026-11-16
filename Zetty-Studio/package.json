@@ -1,0 +1,88 @@
+{
+  "name": "zetty-studio",
+  "version": "0.1.1",
+  "private": true,
+  "description": "Samostatné streamovací studio pro Windows. Scény, multistream, chat a alerty.",
+  "main": "dist-electron/electron/main.js",
+  "scripts": {
+    "postinstall": "node scripts/install-electron.mjs",
+    "dev": "npm run build:desktop && concurrently -k \"vite --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && electron . --dev\"",
+    "dev:web": "vite --host 127.0.0.1",
+    "build:desktop": "tsc -p tsconfig.electron.json && node scripts/preload.mjs",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "build": "npm run typecheck && vite build && npm run build:desktop",
+    "start": "electron .",
+    "dist": "npm run build && electron-builder --win nsis --x64",
+    "pack": "npm run build && electron-builder --dir --win --x64",
+    "test": "tsx --test tests/*.test.ts",
+    "test:ui": "playwright test",
+    "relay": "tsx relay/server.ts"
+  },
+  "keywords": [],
+  "author": "Zetty Studio contributors",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "ffmpeg-static": "^5.3.0",
+    "lucide-react": "^1.73.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "ws": "^8.23.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/ffmpeg-static": "^3.0.3",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/ws": "^8.18.2",
+    "@vitejs/plugin-react": "^6.3.0",
+    "concurrently": "^10.0.7",
+    "electron": "^45.3.3",
+    "electron-builder": "^26.18.0",
+    "prettier": "^3.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "wait-on": "^9.5.1"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
+  },
+  "build": {
+    "appId": "studio.streamnest.app",
+    "productName": "Zetty Studio",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "build/icon.png",
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json",
+      "LICENSE",
+      "THIRD_PARTY.md"
+    ],
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": "nsis",
+      "artifactName": "Zetty-Studio-${version}-Setup.${ext}",
+      "signExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "shortcutName": "Zetty Studio",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    }
+  }
+}
